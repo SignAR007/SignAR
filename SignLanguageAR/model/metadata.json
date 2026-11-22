@@ -1,0 +1,172 @@
+{
+  "labels": [
+    "NO SIGN",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "J",
+    "Z"
+  ],
+  "sequence_length": 10,
+  "feature_count": 68,
+  "feature_version": "signar-fsl-hand-v3",
+  "reject_label": "NO SIGN",
+  "label_metadata": {
+    "NO SIGN": {
+      "unitType": "background",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "A": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "B": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "C": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "D": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "E": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "F": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "G": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "H": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "I": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "K": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "L": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "M": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "N": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "O": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "P": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "Q": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "R": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "S": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "T": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "U": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "V": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "W": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "X": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "Y": {
+      "unitType": "fingerspelling",
+      "motionType": "static",
+      "displayText": ""
+    },
+    "J": {
+      "unitType": "fingerspelling",
+      "motionType": "dynamic",
+      "displayText": ""
+    },
+    "Z": {
+      "unitType": "fingerspelling",
+      "motionType": "dynamic",
+      "displayText": ""
+    }
+  }
+}
