@@ -1,4 +1,4 @@
-const CACHE = "signar-v36";
+const CACHE = "signar-v41";
 const CORE = [
   "./",
   "./index.html",
@@ -8,14 +8,15 @@ const CORE = [
   "./src/core/fsl-pipeline.js",
   "./src/tracker/mediapipe-tracker.js",
   "./src/interpreter/prediction-history.js",
+  "./src/interpreter/stream-segmenter.js",
   "./src/interpreter/app.js",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./model/vocabulary.json",
   "./model/metadata.json",
   "./model/evaluation.json",
-  "./model/model-signar-hand-v3.json",
-  "./model/weights-signar-hand-v3.bin",
+  "./model/model-fb5b258b0458fa2e3646.json",
+  "./model/weights-7c01bea8c4378b719fe7c64a958209389406346b99cd34a67a63c6c60371b903.bin",
 ];
 self.addEventListener("install", (e) =>
   e.waitUntil(
