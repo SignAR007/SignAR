@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f1f6fb">
+  <meta name="description" content="A guided, private workspace for collecting Filipino Sign Language training samples.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <title>SignAR · FSL Sign Collection</title>
+  <script src="../../SignLanguageAR/src/ui/theme.js"></script>
+  <link rel="stylesheet" href="../src/ui/collect.css">
+  <link rel="stylesheet" href="../src/ui/collect-theme.css">
+  <link rel="icon" href="../../SignLanguageAR/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../SignLanguageAR/icons/icon.svg">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><img class="mark" src="../../SignLanguageAR/icons/icon.svg" alt="" aria-hidden="true"><div><p class="overline">SIGNAR · LOCAL TRAINING</p><h1>Training studio</h1><p class="subhead">A private workspace for verified FSL samples.</p></div></div>
+      <div class="top-actions">
+        <button class="button theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode">Dark mode</button>
+        <span class="status" id="storageStatus">Opening local storage…</span>
+      </div>
+    </header>
+
+    <section class="studio-intro">
+      <div>
+        <p class="overline">FILIPINO SIGN LANGUAGE · SAMPLE COLLECTION</p>
+        <h2>Build a clearer sign library.</h2>
+        <p>Verify the sign, record or import a performance, then review your samples before training. Camera capture is optional.</p>
+      </div>
+      <aside class="notice">      <strong>Privacy first.</strong> Use an alias and get permission. Source videos and images stay in this browser; landmark data is sent only to this computer's local trainer when you select Start Training.</aside>
+    </section>
+
+    <div class="workspace">
+      <section class="card form-card">
+        <div class="card-head"><div><p class="overline">PREPARE · SIGN DETAILS</p><h2>Describe the sample</h2><p class="microcopy">Use one verified sign or background label and one signer alias for each sample.</p></div></div>
+
+        <label>Signer alias <input id="signerId" list="signerOptions" value="signer-01" maxlength="40" autocomplete="off" placeholder="e.g. signer-01"></label>
+        <datalist id="signerOptions"></datalist>
+        <p class="microcopy field-help">Choose a saved signer alias or type a new one.</p>
+        <label>FSL sign or background label <input id="labelSelect" type="text" list="labelOptions" maxlength="40" autocomplete="off" placeholder="Choose a sign or NO SIGN" aria-describedby="labelHelp"></label>
+        <datalist id="labelOptions"><option value="NO SIGN"></datalist>
+        <p class="microcopy field-help" id="labelHelp">For camera capture, use one unique model label per sign. Batch imports derive each label from its filename, so this field may be left blank; signer prefixes and UUID, sample-ID, or numeric suffixes are removed, and underscores become spaces. Word and phrase labels describe the complete sign unit. Choose NO SIGN for background examples.</p>
+        <div class="sample-edit-fields">
+          <label>Sign unit <select id="unitType"><option value="fingerspelling">Fingerspelling letter</option><option value="word">Word sign</option><option value="phrase">Phrase sign</option><option value="background">Background / no sign</option></select></label>
+          <label>Movement <select id="motionType"><option value="static">Static / held shape</option><option value="dynamic">Dynamic / moving sign</option></select></label>
+        </div>
+        <label>Display text or translation <input id="displayText" type="text" maxlength="120" autocomplete="off" placeholder="Optional; defaults to the label" aria-describedby="displayTextHelp"></label>
+        <p class="microcopy field-help" id="displayTextHelp">For word and phrase signs, enter the text to add to the sentence. Dynamic samples need a video that shows the complete movement; still images cannot validate motion.</p>
+        <label>Reference or reviewer <input id="verificationNotes" type="text" list="reviewerOptions" maxlength="200" required autocomplete="off" placeholder="e.g. FSL SignBank + teacher review" aria-describedby="notesHelp"></label>
+        <datalist id="reviewerOptions"></datalist>
+        <p class="microcopy field-help" id="notesHelp">Choose a saved reference or reviewer note, or type a new one.</p>
+        <label class="checkline"><input id="verified" type="checkbox"><span>A qualified signer, teacher, or interpreter checked this label and sample. For NO SIGN, they confirmed that no intended sign is being performed.</span></label>
+        <label class="checkline"><input id="consent" type="checkbox"><span>The signer gave informed permission for recording and local storage.</span></label>
+
+        <details class="import-panel">
+          <summary><span><strong>Already have a video or image?</strong><small>Import a clip or still image instead of recording with the camera</small></span></summary>
+          <div class="import-content">
+            <p class="microcopy">Choose one or more videos or still images. Each file should show one sign by one signer. Images are static snapshots; very short videos can use one usable landmark frame, but dynamic signs need their full movement. For efficiency, video analysis is limited to 90 sampled frames per clip; use a short clip centered on one sign. Imported videos and still images retain their source orientation; camera mirroring applies only to the live camera preview. Holistic landmarks follow the signer and source orientation; legacy hand-slot records are corrected during migration. Original media files are preserved. Landmark overlays stay aligned with the displayed source. Every imported file gets its label from its filename, so no label needs to be entered above. A name such as <code>signer-01_GOOD_MORNING_94b86dbe-e01b-4180-a637-8966e4702069.webm</code> saves as <code>GOOD MORNING</code>; IDs and a matching signer prefix are removed, and underscores become spaces. Other filenames use their name without the extension as the label. The source files and landmarks are saved on this device. MP4 (H.264), WebM (VP8), PNG, JPEG, WebP, and BMP work best.</p>
+            <label>Video or still images <input id="importMediaFile" type="file" multiple accept="video/mp4,video/webm,video/quicktime,video/x-m4v,image/jpeg,image/png,image/webp,image/bmp,.mp4,.webm,.mov,.m4v,.ogv,.jpg,.jpeg,.png,.webp,.bmp" aria-describedby="importProgress"></label>
+            <p class="microcopy" id="importProgress" aria-live="polite">Choose one or more videos or images. If sign details or consent are missing, import waits; copy the full message here if it fails.</p>
+            <p class="microcopy import-batch-status" id="importBatchStatus" role="status" aria-live="polite" hidden></p>
+          </div>
+        </details>
+      </section>
+
+      <section class="card camera-card">
+        <div class="card-head"><div><p class="overline">FRAME · CAPTURE</p><h2>Set up the signer</h2><p class="microcopy">Keep both hands, face, and upper body clearly in frame. The holistic tracker records coordinated cues and movement across the complete sign.</p></div><span class="live-indicator" id="trackingStatus">Not started</span></div>
+        <div class="stage" id="stage">
+          <video id="camera" autoplay playsinline muted></video>
+          <canvas id="landmarkCanvas"></canvas>
+          <div class="guide" id="guide"><div class="guide-shape"></div><p>Keep both hands, face, and upper body visible</p></div>
+          <div class="stage-label" id="stageLabel">Camera is off</div>
+        </div>
+        <div class="button-row">
+          <button class="button primary" id="startCamera">Start camera</button>
+          <button class="button" id="switchCamera" type="button">Use front camera</button>
+          <button class="button" id="stopCamera" disabled>Turn camera off</button>
+        </div>
+        <p class="microcopy camera-help">Camera capture is optional. If you use it, your browser may ask for permission; the preview stays in this browser while local landmark tracking warms up.</p>
+        <div class="record-state" id="recordState"><span class="dot"></span><span>Not recording</span><span id="frameCounter">0 frames</span></div>
+        <label class="checkline auto-line"><input type="checkbox" id="autoCapture" aria-describedby="autoCaptureHelp"><span><strong>Hands-free capture</strong><small id="autoCaptureHelp">Optional: automatically start when a sign begins and save after you pause. Leave off for manual control.</small></span></label>
+        <div class="button-row capture-buttons"><button class="button primary" id="startRecording" disabled>Start recording</button><button class="button warning" id="stopRecording" disabled>Stop and save</button></div>
+        <p class="microcopy" id="captureHelp">Complete the sign details and start the camera to record a sample.</p>
+        <details class="diagnostics">
+          <summary>Camera troubleshooting</summary>
+          <p class="microcopy tracking-diagnostics" id="frameDiagnostics" aria-live="polite">Tracker diagnostics: waiting for camera results.</p>
+        </details>
+      </section>
+    </div>
+
+    <section class="card library-card">
+      <div class="card-head wrap"><div><p class="overline">COLLECT · REVIEW</p><h2>Your saved samples</h2><p class="subhead" id="sampleSummary">No samples yet. Each recording is saved only in this browser.</p></div>
+        <div class="button-row export-row"><button class="button" id="exportJson" disabled>Export landmark JSON</button>        <button class="button danger" id="deleteAll" disabled>Delete local samples</button></div>
+      </div>
+      <div class="sample-tools" aria-label="Search, filter, and sort saved samples">
+        <label for="sampleSearch">Search<input id="sampleSearch" type="search" placeholder="Label or signer"></label>
+        <label for="sampleLabelFilter">Filter by label<select id="sampleLabelFilter"><option value="">All labels</option></select></label>
+        <label for="sampleSignerFilter">Filter by signer<select id="sampleSignerFilter"><option value="">All signers</option></select></label>
+        <label for="sampleSort">Sort by<select id="sampleSort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="label">Label A–Z</option><option value="signer">Signer A–Z</option></select></label>
+      </div>
+      <div class="sample-bulk-tools" aria-label="Bulk sample actions">
+        <label class="checkline"><input id="selectFilteredSamples" type="checkbox" disabled> Select filtered</label>
+        <span class="selected-count" id="selectedSampleCount" aria-live="polite">0 selected</span>
+        <button class="button" id="downloadSelected" type="button" disabled>Download selected</button>
+        <button class="button danger" id="deleteSelected" type="button" disabled>Delete selected</button>
+      </div>
+      <div class="sample-maintenance-tools">
+        <button class="button" id="analyzeSamples" type="button" disabled>Analyze saved samples</button>
+        <button class="button danger" id="applySampleCleanup" type="button" disabled>Repair valid samples / delete invalid</button>
+        <p class="microcopy" id="sampleHealthSummary" role="status" aria-live="polite">Sample frame health has not been analyzed.</p>
+        <details id="sampleCleanupDetails" hidden>
+          <summary>Review samples marked for deletion</summary>
+          <ul id="sampleCleanupList"></ul>
+        </details>
+      </div>
+      <div class="download-progress" id="downloadProgress" role="status" aria-live="polite" hidden><span id="downloadProgressLabel"></span><progress id="downloadProgressBar" max="100" value="0" aria-label="Selected sample archive progress"></progress></div>
+      <p class="sample-result-count" id="sampleFilterSummary" aria-live="polite">No samples to show.</p>
+      <div class="sample-list" id="sampleList" tabindex="0" role="region" aria-label="Saved training samples"><p class="empty">No samples yet. Saved samples will appear here.</p></div>
+    </section>
+
+    <section class="card training-card" aria-labelledby="trainingTitle">
+      <div class="card-head wrap">
+        <div><p class="overline">LOCAL PYTHON TRAINER</p><h2 id="trainingTitle">Train SignAR's candidate model</h2><p class="subhead">Each run trains from the full eligible dataset and evaluates every supported sign label with signer-held-out folds. Adding a word, phrase, or dynamic sign therefore trains the full vocabulary together.</p></div>
+      </div>
+      <div class="button-row training-actions">
+        <button class="button primary" id="trainModel" disabled>Start Training</button>
+        <button class="button" id="deployModel" disabled>Transfer candidate to interpreter</button>
+      </div>
+      <p class="microcopy training-coverage" id="trainingCoverage" aria-live="polite">Dataset coverage appears here after samples load.</p>
+      <p class="training-message" id="trainingMessage" role="status" aria-live="polite">Save reviewed samples in batches, then select Start Training. Every run trains the complete eligible dataset and reevaluates all labels.</p>
+      <p class="microcopy deployment-message" id="deploymentMessage" role="status" aria-live="polite">Model transfer becomes available after a candidate passes validation.</p>
+      <div class="training-progress-wrap" id="trainingProgressWrap" aria-busy="false">
+        <div class="training-progress-heading">
+          <span class="training-spinner" aria-hidden="true"></span>
+          <div class="training-progress-label"><span id="trainingProgressLabel">Waiting for you to start</span><span id="trainingEpochCount">Trainer idle</span></div>
+        </div>
+        <div class="training-progress-track">
+          <progress id="trainingProgress" max="100" value="0" aria-label="Model training progress"></progress>
+        </div>
+      </div>
+      <div class="training-metrics" aria-live="polite">
+        <div class="training-metric"><span>Held-out test accuracy</span><strong id="testAccuracy">—</strong></div>
+        <div class="training-metric"><span>Test samples</span><strong id="testSampleCount">—</strong></div>
+        <div class="training-metric"><span>Evaluation scope</span><strong id="evaluationScope">—</strong></div>
+        <div class="training-metric"><span>Model eligible</span><strong id="deploymentEligible">—</strong></div>
+      </div>
+      <details class="training-evaluation" id="trainingEvaluationDetails" hidden>
+        <summary>Per-sign held-out results</summary>
+        <div class="training-evaluation-table" tabindex="0" role="region" aria-label="Per-sign held-out results">
+          <table>
+            <caption>Performance on held-out clips. Live model scores are separate and uncalibrated.</caption>
+            <thead><tr><th scope="col">Sign</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th><th scope="col">Test clips</th></tr></thead>
+            <tbody id="trainingClassMetrics"></tbody>
+          </table>
+        </div>
+        <p class="microcopy training-evaluation-note" id="trainingEvaluationNote"></p>
+      </details>
+      <p class="microcopy training-note">The trainer exports candidate files to <code>trained-model</code>. A completed run does not by itself approve deployment; review the evaluation and sign labels, then use Transfer candidate to interpreter. The active manifest is backed up before activation.</p>
+    </section>
+    <footer>Private collection on this device · source media stays in this browser; training sends landmark data only to the local trainer.</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../../SignLanguageAR/src/core/fsl-pipeline.js"></script>
+  <script src="../../SignLanguageAR/src/ui/landmark-renderer.js"></script>
+  <script src="../../SignLanguageAR/src/tracker/mediapipe-tracker.js"></script>
+  <script src="../src/collector/browser-trainer.js"></script>
+  <script src="../src/collector/collect.js"></script>
+</body>
+</html>
