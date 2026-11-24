@@ -2,12 +2,33 @@
 (() => {
   "use strict";
   const PIPELINE = window.SignARPipeline;
-  const TIMEOUT_MS = 12000;
+  const INITIALIZATION_TIMEOUT_MS = 90000;
+  const ASSET_TIMEOUT_MS = 15000;
+
+  function withTimeout(promise, timeoutMs, description) {
+    let timer;
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = window.setTimeout(
+          () =>
+            reject(
+              new Error(
+                description + " timed out after " +
+                  Math.round(timeoutMs / 1000) + " seconds.",
+              ),
+            ),
+          timeoutMs,
+        );
+      }),
+    ]).finally(() => window.clearTimeout(timer));
+  }
 
   function createTracker({ onWarning = () => {} } = {}) {
     let closed = false;
     let frameProcessing = false;
     let initializationPromise = null;
+    let initializationStage = "MediaPipe Tasks Vision module";
     let landmarker = null;
     let frameCount = 0;
     let averageFrameMs = 0;
@@ -19,7 +40,12 @@
       const failures = [];
       for (const source of PIPELINE.config.assets.tasksVision) {
         try {
-          return await import(source);
+          initializationStage = "MediaPipe Tasks Vision module from " + source;
+          return await withTimeout(
+            import(source),
+            ASSET_TIMEOUT_MS,
+            "Loading " + source,
+          );
         } catch (error) {
           failures.push(`${source}: ${error.message}`);
         }
@@ -38,9 +64,14 @@
           let lastError = null;
           for (const wasmUrl of PIPELINE.config.assets.handWasm) {
             try {
-              const files =
-                await vision.FilesetResolver.forVisionTasks(wasmUrl);
+              initializationStage = "MediaPipe WebAssembly runtime from " + wasmUrl;
+              const files = await withTimeout(
+                vision.FilesetResolver.forVisionTasks(wasmUrl),
+                ASSET_TIMEOUT_MS,
+                "Loading MediaPipe WebAssembly from " + wasmUrl,
+              );
               try {
+                initializationStage = "HolisticLandmarker model on GPU";
                 landmarker = await vision.HolisticLandmarker.createFromOptions(
                   files,
                   {
@@ -57,6 +88,7 @@
                   "GPU holistic tracking could not initialize; trying CPU.",
                   gpuError,
                 );
+                initializationStage = "HolisticLandmarker model on CPU";
                 landmarker = await vision.HolisticLandmarker.createFromOptions(
                   files,
                   {
@@ -79,24 +111,33 @@
           );
         })();
       }
+      let timedOut = false;
+      let timeoutId;
       try {
         return await Promise.race([
           initializationPromise,
-          new Promise((_, reject) =>
-            setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    "MediaPipe holistic tracking initialization timed out.",
-                  ),
+          new Promise((_, reject) => {
+            timeoutId = window.setTimeout(() => {
+              timedOut = true;
+              reject(
+                new Error(
+                  "MediaPipe holistic tracking initialization timed out after " +
+                    Math.round(INITIALIZATION_TIMEOUT_MS / 1000) +
+                    " seconds while loading " +
+                    initializationStage +
+                    ". Check the network requests to jsDelivr, unpkg, and storage.googleapis.com.",
                 ),
-              TIMEOUT_MS,
-            ),
-          ),
+              );
+            }, INITIALIZATION_TIMEOUT_MS);
+          }),
         ]);
       } catch (error) {
-        initializationPromise = null;
+        // Keep a still-running initialization so another click does not start a
+        // second model download. Clear it only after the actual initialization fails.
+        if (!timedOut) initializationPromise = null;
         throw error;
+      } finally {
+        window.clearTimeout(timeoutId);
       }
     }
 
