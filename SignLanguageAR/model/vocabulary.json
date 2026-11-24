@@ -76,7 +76,7 @@
     "acceptanceProfile": "signar-standard-v1",
     "acceptanceThresholds": {
       "meanLeaveOneSignerOutAccuracy": 0.9,
-      "minimumLetterRecall": 0.8,
+      "minimumSignRecall": 0.8,
       "maximumNoSignFalseAcceptRate": 0.1,
       "minimumNoSignSamples": 10,
       "noSignShareRange": [
@@ -1255,7 +1255,7 @@
     }
   },
   "acceptanceProfile": "signar-standard-v1",
-  "note": "This hand-v3 evaluation uses signer-held-out folds on the recorded dataset. The camera samples are all NO SIGN, so live-camera accuracy for the fingerspelling labels is unverified.",
+  "note": "This signer-held-out evaluation summarizes the recorded hand-v3 dataset. Live-camera samples do not cover the sign labels, so results may differ across signers, cameras, and environments.",
   "metadataPath": "./model/metadata.json",
   "recognitionMode": "isolated-sign-classification",
   "motionInput": "ordered-hand-landmark-sequence",

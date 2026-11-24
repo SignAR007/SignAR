@@ -2,6 +2,8 @@
 
 SignAR is a browser-based Filipino Sign Language recognition system. Its vocabulary can include fingerspelling, word signs, whole phrase signs, static signs, and dynamic signs. Camera frames and landmarks are processed locally. The decoder displays labels emitted by a compatible model.
 
+The app is an installable browser experience, not a native Android or iOS application. Accepted labels and configured meanings appear in a two-dimensional card over the camera preview. The current interface does not spatially anchor 3D content. Recognition practice, transcript editing, and optional speech output are available; a separate sign-chart or structured lesson mode is not part of this release. Text output is assembled from model-supported labels and is not open-ended FSL translation.
+
 ## Current model status
 
 The installed model uses 10 frames of 68 hand-v3 values and recognizes the existing fingerspelling vocabulary. The live tracker and collector use holistic-v4: 30 frames that represent both hands, face, and body. The interpreter selects features from the version declared by the model, so the installed weights keep working while a holistic-v4 candidate is collected, trained, evaluated, and transferred.

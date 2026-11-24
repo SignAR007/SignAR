@@ -1,7 +1,7 @@
 {
-  "name": "SignAR - Filipino Sign Language Recognition & AR Learning",
+  "name": "SignAR - Filipino Sign Language Recognition",
   "short_name": "SignAR",
-  "description": "Real-time Filipino Sign Language recognition, AR visualization, sign-to-text, digital learning chart, and speech.",
+  "description": "Browser-based Filipino Sign Language recognition with live camera feedback and optional speech output.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

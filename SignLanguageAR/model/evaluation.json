@@ -3,7 +3,7 @@
   "acceptanceProfile": "signar-standard-v1",
   "acceptanceThresholds": {
     "meanLeaveOneSignerOutAccuracy": 0.9,
-    "minimumLetterRecall": 0.8,
+    "minimumSignRecall": 0.8,
     "maximumNoSignFalseAcceptRate": 0.1,
     "minimumNoSignSamples": 10,
     "noSignShareRange": [

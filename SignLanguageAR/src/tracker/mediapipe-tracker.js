@@ -1,4 +1,4 @@
-/* Pinned MediaPipe Tasks Vision HandLandmarker lifecycle shared by collector and decoder. */
+/* Pinned MediaPipe Tasks Vision HolisticLandmarker lifecycle shared by collector and decoder. */
 (() => {
   "use strict";
   const PIPELINE = window.SignARPipeline;
@@ -41,31 +41,31 @@
               const files =
                 await vision.FilesetResolver.forVisionTasks(wasmUrl);
               try {
-                landmarker = await vision.HandLandmarker.createFromOptions(
+                landmarker = await vision.HolisticLandmarker.createFromOptions(
                   files,
                   {
                     baseOptions: {
-                      modelAssetPath: PIPELINE.config.assets.handModel,
+                      modelAssetPath: PIPELINE.config.assets.holisticModel,
                       delegate: "GPU",
                     },
                     runningMode: "VIDEO",
-                    ...PIPELINE.config.tracking.handOptions,
+                    ...PIPELINE.config.tracking.holisticOptions,
                   },
                 );
               } catch (gpuError) {
                 onWarning(
-                  "GPU hand tracking could not initialize; trying CPU.",
+                  "GPU holistic tracking could not initialize; trying CPU.",
                   gpuError,
                 );
-                landmarker = await vision.HandLandmarker.createFromOptions(
+                landmarker = await vision.HolisticLandmarker.createFromOptions(
                   files,
                   {
                     baseOptions: {
-                      modelAssetPath: PIPELINE.config.assets.handModel,
+                      modelAssetPath: PIPELINE.config.assets.holisticModel,
                       delegate: "CPU",
                     },
                     runningMode: "VIDEO",
-                    ...PIPELINE.config.tracking.handOptions,
+                    ...PIPELINE.config.tracking.holisticOptions,
                   },
                 );
               }
@@ -75,7 +75,7 @@
             }
           }
           throw new Error(
-            `Could not initialize MediaPipe hand tracking: ${lastError?.message || "all pinned WASM sources failed"}`,
+            `Could not initialize MediaPipe holistic tracking: ${lastError?.message || "all pinned WASM sources failed"}`,
           );
         })();
       }
@@ -87,7 +87,7 @@
               () =>
                 reject(
                   new Error(
-                    "MediaPipe hand tracking initialization timed out.",
+                    "MediaPipe holistic tracking initialization timed out.",
                   ),
                 ),
               TIMEOUT_MS,
@@ -126,7 +126,7 @@
       if (closed) throw new Error("The tracker has been closed.");
       if (frameProcessing) {
         const error = new Error(
-          "The hand tracker can process only one frame at a time.",
+          "The holistic tracker can process only one frame at a time.",
         );
         error.name = "InvalidStateError";
         throw error;
@@ -139,7 +139,7 @@
         const timestamp = Math.max(elapsedVideoMs, lastVideoTimestamp + 0.001);
         lastVideoTimestamp = timestamp;
         const result = detector.detectForVideo(image, timestamp);
-        const merged = PIPELINE.mergeHandResults(null, result);
+        const merged = PIPELINE.mergeHolisticResults(result);
         const elapsed = performance.now() - started;
         frameCount++;
         averageFrameMs = averageFrameMs
@@ -148,7 +148,7 @@
         lastFrameAt = performance.now();
         return {
           ...merged,
-          signarHandSource: "MediaPipe Tasks Vision HandLandmarker (GPU/CPU)",
+          signarHandSource: "MediaPipe Tasks Vision HolisticLandmarker (GPU/CPU)",
           signarLandmarkMs: elapsed,
           signarHandSlots: {
             left: PIPELINE.hasUsableHand(merged.leftHandLandmarks),
@@ -170,7 +170,7 @@
       try {
         active?.close?.();
       } catch (error) {
-        onWarning("Could not close MediaPipe hand tracker.", error);
+        onWarning("Could not close MediaPipe holistic tracker.", error);
       }
     }
 

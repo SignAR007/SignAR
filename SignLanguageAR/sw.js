@@ -1,4 +1,4 @@
-const CACHE = "signar-v41";
+const CACHE = "signar-v42";
 const CORE = [
   "./",
   "./index.html",

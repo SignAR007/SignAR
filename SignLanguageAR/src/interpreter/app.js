@@ -77,6 +77,10 @@
     PIPELINE.config.recognition.minimumConfidencePercent;
   const MINIMUM_CLASS_RECALL = 0.8;
   const NO_SIGN_LABEL = "NO SIGN";
+  const MODEL_REQUEST_TIMEOUT_MS = 20000;
+  const MODEL_BENCHMARK_TIMEOUT_MS = 60000;
+  const MODEL_LOAD_TIMEOUT_MS = 30000;
+  const EXTERNAL_SCRIPT_TIMEOUT_MS = 12000;
   const DEBUG_TELEMETRY =
     new URLSearchParams(window.location.search).get("debug") === "1";
   const trackingState = PIPELINE.createTrackingState();
@@ -203,6 +207,78 @@
   function setState(text, cls = "") {
     state.textContent = text;
     state.className = ("recognition-state " + cls).trim();
+  }
+  function withTimeout(promise, timeoutMs, description) {
+    let timer;
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = window.setTimeout(
+          () => reject(new Error(description + " timed out after " + Math.round(timeoutMs / 1000) + " seconds.")),
+          timeoutMs,
+        );
+      }),
+    ]).finally(() => window.clearTimeout(timer));
+  }
+  async function fetchWithTimeout(url, options = {}) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(
+      () => controller.abort(),
+      MODEL_REQUEST_TIMEOUT_MS,
+    );
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } catch (error) {
+      if (controller.signal.aborted)
+        throw new Error(
+          "Timed out reading " + url + " after " +
+            Math.round(MODEL_REQUEST_TIMEOUT_MS / 1000) + " seconds.",
+        );
+      throw error;
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+  function loadExternalScript(src, validate, description) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        script.onload = null;
+        script.onerror = null;
+        if (error) {
+          script.remove();
+          reject(error);
+        } else resolve();
+      };
+      const timer = window.setTimeout(
+        () =>
+          finish(
+            new Error(
+              "Timed out loading " + src + " after " +
+                Math.round(EXTERNAL_SCRIPT_TIMEOUT_MS / 1000) + " seconds.",
+            ),
+          ),
+        EXTERNAL_SCRIPT_TIMEOUT_MS,
+      );
+      script.src = src;
+      script.crossOrigin = "anonymous";
+      script.onload = () => {
+        try {
+          if (validate && !validate())
+            throw new Error(description + " loaded but was not available.");
+          finish();
+        } catch (error) {
+          finish(error);
+        }
+      };
+      script.onerror = () =>
+        finish(new Error("Could not load " + src + "."));
+      document.head.appendChild(script);
+    });
   }
   function cameraStatus(text, online = false) {
     status.classList.toggle("online", online);
@@ -362,7 +438,7 @@
         ? activeCameraMessage
         : "Decoder ready. Start the camera and keep your hands, face, or upper body in frame."
       : modelLoading
-        ? "Checking and loading the eligible FSL model. Sign recognition will be ready when validation completes."
+        ? modelStatus.textContent || "Checking and loading the eligible FSL model."
         : modelStatus.textContent;
     typePill.textContent = modelReady
       ? cameraActive
@@ -382,6 +458,10 @@
       modelLoading ? "verifying" : modelReady ? "" : "locked",
     );
     overlay.classList.remove("active");
+  }
+  function updateModelLoadingStatus(message) {
+    modelStatus.textContent = message;
+    if (modelLoading) showNoSign();
   }
   function clearTopKScores() {
     if (
@@ -579,20 +659,11 @@
         const failures = [];
         for (const src of TENSORFLOW_BASES) {
           try {
-            await new Promise((resolve, reject) => {
-              const script = document.createElement("script");
-              script.src = src;
-              script.crossOrigin = "anonymous";
-              script.onload = () =>
-                window.tf
-                  ? resolve()
-                  : reject(
-                      new Error("TensorFlow.js loaded without defining tf."),
-                    );
-              script.onerror = () =>
-                reject(new Error("The script request failed."));
-              document.head.appendChild(script);
-            });
+            await loadExternalScript(
+              src,
+              () => !!window.tf,
+              "TensorFlow.js",
+            );
             return;
           } catch (error) {
             failures.push(src + ": " + error.message);
@@ -616,22 +687,11 @@
     const failures = [];
     for (const source of PIPELINE.config.assets.tensorflowWasm) {
       try {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = source;
-          script.crossOrigin = "anonymous";
-          script.onload = () =>
-            window.tf?.wasm?.setWasmPaths
-              ? resolve()
-              : reject(
-                  new Error(
-                    "The WASM backend loaded without registering tf.wasm.",
-                  ),
-                );
-          script.onerror = () =>
-            reject(new Error("The backend script request failed."));
-          document.head.appendChild(script);
-        });
+        await loadExternalScript(
+          source,
+          () => !!window.tf?.wasm?.setWasmPaths,
+          "TensorFlow.js WebAssembly backend",
+        );
         const directory = source.slice(0, source.lastIndexOf("/") + 1);
         window.tf.wasm.setWasmPaths(directory);
         return;
@@ -654,15 +714,7 @@
         const failures = [];
         for (const source of PIPELINE.config.assets.tensorflowWebGpu) {
           try {
-            await new Promise((resolve, reject) => {
-              const script = document.createElement("script");
-              script.src = source;
-              script.crossOrigin = "anonymous";
-              script.onload = () => resolve();
-              script.onerror = () =>
-                reject(new Error("The backend script request failed."));
-              document.head.appendChild(script);
-            });
+            await loadExternalScript(source, null, "TensorFlow.js WebGPU backend");
             return;
           } catch (error) {
             failures.push(`${source}: ${error.message}`);
@@ -774,7 +826,7 @@
   async function loadModelManifest() {
     if (!modelManifestPromise)
       modelManifestPromise = (async () => {
-        const response = await fetch("./model/vocabulary.json", {
+        const response = await fetchWithTimeout("./model/vocabulary.json", {
           cache: "no-store",
         });
         if (!response.ok)
@@ -794,7 +846,9 @@
   }
   async function loadModelMetadata(config) {
     const metadataPath = config.metadataPath || "./model/metadata.json";
-    const response = await fetch(metadataPath, { cache: "no-store" });
+    const response = await fetchWithTimeout(metadataPath, {
+      cache: "no-store",
+    });
     if (response.status === 404 && !config.metadataPath) {
       return {
         labels: config.labels,
@@ -947,11 +1001,19 @@
       try {
         modelLoading = true;
         modelReady = false;
-        modelStatus.textContent =
-          "Checking model eligibility and loading the decoder…";
+        updateModelLoadingStatus("Reading the installed model manifest…");
         showNoSign();
-        modelConfig = await loadModelManifest();
-        const metadata = await loadModelMetadata(modelConfig);
+        modelConfig = await withTimeout(
+          loadModelManifest(),
+          MODEL_REQUEST_TIMEOUT_MS,
+          "Reading the model manifest",
+        );
+        updateModelLoadingStatus("Checking the model metadata and eligibility…");
+        const metadata = await withTimeout(
+          loadModelMetadata(modelConfig),
+          MODEL_REQUEST_TIMEOUT_MS,
+          "Reading the model metadata",
+        );
         if (
           JSON.stringify(metadata.labels) !==
             JSON.stringify(modelConfig.labels) ||
@@ -1032,18 +1094,33 @@
           throw new Error(
             "Manifest output class count does not match its sign labels",
           );
-        await loadTensorFlowLibrary();
+        updateModelLoadingStatus("Loading the TensorFlow.js inference library…");
+        await withTimeout(
+          loadTensorFlowLibrary(),
+          EXTERNAL_SCRIPT_TIMEOUT_MS * TENSORFLOW_BASES.length + 2000,
+          "Loading TensorFlow.js",
+        );
         const modelUrl = new URL(modelConfig.modelPath, window.location.href)
           .href;
-        modelConfig.backendBenchmark = await benchmarkTensorFlowBackends(
-          modelUrl,
-          modelConfig,
-          activeSchema,
+        updateModelLoadingStatus("Checking available browser inference backends…");
+        modelConfig.backendBenchmark = await withTimeout(
+          benchmarkTensorFlowBackends(modelUrl, modelConfig, activeSchema),
+          MODEL_BENCHMARK_TIMEOUT_MS,
+          "Checking browser inference backends",
         );
-        model = await window.tf.loadLayersModel(modelUrl);
+        updateModelLoadingStatus("Loading the FSL model weights…");
+        model = await withTimeout(
+          window.tf.loadLayersModel(modelUrl),
+          MODEL_LOAD_TIMEOUT_MS,
+          "Loading the FSL model weights",
+        );
         try {
           validateModelShape(model, modelConfig, activeSchema);
-          await warmupModel(model, activeSchema);
+          await withTimeout(
+            warmupModel(model, activeSchema),
+            MODEL_LOAD_TIMEOUT_MS,
+            "Preparing the FSL model",
+          );
         } catch (error) {
           model.dispose();
           model = null;
@@ -1960,8 +2037,7 @@
   switchBtn.textContent = "Use front camera";
   updateSentence();
   modelLoading = true;
-  modelStatus.textContent =
-    "Checking model eligibility and loading the decoder…";
+  modelStatus.textContent = "Starting decoder model checks…";
   showNoSign();
   void loadModel();
 })();

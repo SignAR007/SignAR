@@ -1,0 +1,528 @@
+{
+  "project": "SignAR FSL Decoder",
+  "schemaVersion": 2,
+  "featureVersion": "signar-fsl-hand-v3",
+  "trained": true,
+  "testMode": false,
+  "modelPath": "./model/model-signar-standard.json",
+  "rejectLabel": "NO SIGN",
+  "sequenceLength": 10,
+  "featureDimension": 68,
+  "samplingFps": 15,
+  "sampleWindowSeconds": 0.67,
+  "outputClasses": 27,
+  "labels": [
+    "NO SIGN",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "J",
+    "Z"
+  ],
+  "minimumSignersPerLabel": 5,
+  "distinctSignersPerLabel": {
+    "NO SIGN": 5,
+    "A": 5,
+    "B": 5,
+    "C": 5,
+    "D": 5,
+    "E": 5,
+    "F": 5,
+    "G": 5,
+    "H": 5,
+    "I": 5,
+    "K": 5,
+    "L": 5,
+    "M": 5,
+    "N": 5,
+    "O": 5,
+    "P": 5,
+    "Q": 5,
+    "R": 5,
+    "S": 5,
+    "T": 5,
+    "U": 5,
+    "V": 5,
+    "W": 5,
+    "X": 5,
+    "Y": 5,
+    "J": 5,
+    "Z": 5
+  },
+  "readinessBlockers": [],
+  "evaluation": {
+    "testMode": false,
+    "evaluationScope": "signer-independent",
+    "deploymentEligible": true,
+    "testAccuracy": 0.9956507710724847,
+    "minimumAccuracy": 0.9,
+    "minimumClassRecall": 0.8,
+    "readinessBlockers": [],
+    "classRecall": {
+      "NO SIGN": 0.9903381642512077,
+      "A": 0.9655172413793104,
+      "B": 1.0,
+      "C": 1.0,
+      "D": 1.0,
+      "E": 1.0,
+      "F": 1.0,
+      "G": 1.0,
+      "H": 1.0,
+      "I": 1.0,
+      "K": 1.0,
+      "L": 1.0,
+      "M": 1.0,
+      "N": 1.0,
+      "O": 1.0,
+      "P": 1.0,
+      "Q": 1.0,
+      "R": 1.0,
+      "S": 1.0,
+      "T": 1.0,
+      "U": 0.9655172413793104,
+      "V": 1.0,
+      "W": 1.0,
+      "X": 1.0,
+      "Y": 1.0,
+      "J": 1.0,
+      "Z": 1.0
+    },
+    "classificationReport": {
+      "NO SIGN": {
+        "precision": 0.9951456310679612,
+        "recall": 0.9903381642512077,
+        "f1-score": 0.9927360774818402,
+        "support": 207.0
+      },
+      "A": {
+        "precision": 1.0,
+        "recall": 0.9655172413793104,
+        "f1-score": 0.9824561403508771,
+        "support": 29.0
+      },
+      "B": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "C": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "D": {
+        "precision": 0.9666666666666667,
+        "recall": 1.0,
+        "f1-score": 0.9830508474576272,
+        "support": 29.0
+      },
+      "E": {
+        "precision": 0.9666666666666667,
+        "recall": 1.0,
+        "f1-score": 0.9830508474576272,
+        "support": 29.0
+      },
+      "F": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "G": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "H": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "I": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "K": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "L": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "M": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "N": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "O": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "P": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "Q": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "R": {
+        "precision": 0.9666666666666667,
+        "recall": 1.0,
+        "f1-score": 0.9830508474576272,
+        "support": 29.0
+      },
+      "S": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "T": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "U": {
+        "precision": 1.0,
+        "recall": 0.9655172413793104,
+        "f1-score": 0.9824561403508771,
+        "support": 29.0
+      },
+      "V": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "W": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "X": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "Y": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "J": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "Z": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+      },
+      "accuracy": 0.9958376690946931,
+      "macro avg": {
+        "precision": 0.996116504854369,
+        "recall": 0.9970878758151789,
+        "f1-score": 0.9965481815020917,
+        "support": 961.0
+      },
+      "weighted avg": {
+        "precision": 0.9959366759948678,
+        "recall": 0.9958376690946931,
+        "f1-score": 0.9958420893942823,
+        "support": 961.0
+      }
+    },
+    "confusionMatrix": [
+      [
+        205, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0
+      ],
+      [
+        1, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 28, 0, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+        0, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        29, 0, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 29, 0
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 29
+      ]
+    ],
+    "labels": [
+      "NO SIGN",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "J",
+      "Z"
+    ],
+    "leaveOneSignerOut": {
+      "meanAccuracy": 0.9956507710724847,
+      "folds": [
+        {
+          "accuracy": 0.994535519125683,
+          "temperature": 0.5,
+          "trainSampleCount": 567,
+          "validationSampleCount": 211,
+          "testSampleCount": 183,
+          "sampleCount": 183
+        },
+        {
+          "accuracy": 0.9932885906040269,
+          "temperature": 0.5,
+          "trainSampleCount": 605,
+          "validationSampleCount": 207,
+          "testSampleCount": 149,
+          "sampleCount": 149
+        },
+        {
+          "accuracy": 1.0,
+          "temperature": 0.5,
+          "trainSampleCount": 567,
+          "validationSampleCount": 183,
+          "testSampleCount": 211,
+          "sampleCount": 211
+        },
+        {
+          "accuracy": 0.995260663507109,
+          "temperature": 0.5,
+          "trainSampleCount": 601,
+          "validationSampleCount": 149,
+          "testSampleCount": 211,
+          "sampleCount": 211
+        },
+        {
+          "accuracy": 0.9951690821256038,
+          "temperature": 0.5,
+          "trainSampleCount": 543,
+          "validationSampleCount": 211,
+          "testSampleCount": 207,
+          "sampleCount": 207
+        }
+      ]
+    },
+    "noSignFalseAcceptRate": 0.004830917874396135,
+    "noSignShare": 0.2154006243496358,
+    "sampleSourceCounts": {
+      "camera": 18,
+      "imported-video": 943
+    },
+    "expectedCalibrationError": 0.03708284373834156,
+    "temperatureScaling": {
+      "method": "held-out signer grid search",
+      "foldTemperatures": [0.5, 0.5, 0.5, 0.5, 0.5],
+      "finalTemperature": 0.5
+    },
+    "stressTestsCorrectOrRejected": {
+      "slot_swap": 0.9976915345459261,
+      "missing_face": 0.9976915345459261,
+      "missing_pose": 0.9976915345459261,
+      "jitter": 0.9976915345459261,
+      "scale_rotation": 0.9948072606019525,
+      "static_hold": 0.9300910657639184,
+      "dropped_frames": 1.0
+    },
+    "signerCount": 5,
+    "sampleCounts": {
+      "dataset": 961,
+      "train": 577,
+      "validation": 192,
+      "test": 961
+    },
+    "acceptanceProfile": "signar-standard-v1",
+    "noSignSampleCount": 207,
+    "acceptanceThresholds": {
+      "meanLeaveOneSignerOutAccuracy": 0.9,
+      "minimumLetterRecall": 0.8,
+      "maximumNoSignFalseAcceptRate": 0.1,
+      "minimumNoSignSamples": 10,
+      "noSignShareRange": [0.01, 0.25],
+      "minimumStressCorrectOrReject": 0.9,
+      "minimumSignersPerLabel": 5
+    }
+  },
+  "featureSchema": {
+    "hand": {
+      "pointCount": 21,
+      "coordinateValues": [
+        "wristRelativePalmX",
+        "wristRelativePalmY",
+        "wristRelativePalmZ"
+      ],
+      "fingerAngleCount": 5,
+      "dimension": 68,
+      "faceOrPoseDependent": false
+    }
+  },
+  "note": "SignAR standard validation profile: signer-held-out hand-v3 model; limited live and NO SIGN examples mean This evaluation reflects the recorded dataset; performance on unrepresented signs, people, and environments remains unverified.",
+  "acceptanceProfile": "signar-standard-v1",
+  "metadataPath": "./model/metadata.json"
+}

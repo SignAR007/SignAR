@@ -14,7 +14,7 @@
     />
     <meta
       name="description"
-      content="SignAR: real-time recognition and augmented reality visualization of Filipino Sign Language for interactive learning and communication."
+      content="SignAR is an installable browser-based Filipino Sign Language recognizer with live camera feedback and optional speech output."
     />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" crossorigin />
@@ -405,7 +405,9 @@
                 SignAR converts model-supported FSL signs into readable text
                 using local camera processing. Its vocabulary can expand as
                 reviewed words, phrases, and dynamic signs are added to the
-                model.
+                model. Accepted labels and configured meanings appear in a
+                two-dimensional card over the camera preview; the current
+                release does not spatially anchor 3D content.
               </p>
             </article>
           </div>
@@ -414,6 +416,64 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    <script>
+      (() => {
+        const failStartup = (message) => {
+          const state = document.getElementById("recognitionState");
+          if (
+            !state ||
+            !["CHECKING MODEL", "LOADING MODEL"].includes(
+              state.textContent.trim(),
+            )
+          )
+            return;
+          state.textContent = "DECODER STARTUP ERROR";
+          state.className = "recognition-state locked";
+          const detected = document.getElementById("detectedSign");
+          const translation = document.getElementById("translationText");
+          const type = document.getElementById("typePill");
+          const modelStatus = document.getElementById("modelStatus");
+          if (detected) detected.textContent = "UNAVAILABLE";
+          if (translation) translation.textContent = message;
+          if (type) type.textContent = "Startup error";
+          if (modelStatus) modelStatus.textContent = message;
+        };
+
+        window.addEventListener(
+          "error",
+          (event) => {
+            if (event.target instanceof HTMLScriptElement) {
+              const source = event.target.src;
+              if (source.includes("/src/"))
+                failStartup(
+                  "Could not load a decoder script. Check the GitHub Pages deployment and refresh the page.",
+                );
+              return;
+            }
+            if (event.filename && event.filename.includes("/src/"))
+              failStartup(
+                "The decoder could not start: " +
+                  (event.message || "a script error occurred") +
+                  ". Refresh the page; if this continues, check the browser console.",
+              );
+          },
+          true,
+        );
+
+        window.addEventListener(
+          "DOMContentLoaded",
+          () =>
+            window.setTimeout(() => {
+              const state = document.getElementById("recognitionState");
+              if (state?.textContent.trim() === "CHECKING MODEL")
+                failStartup(
+                  "The decoder did not initialize. Refresh the page; if this continues, check the GitHub Pages deployment and browser console.",
+                );
+            }, 10000),
+          { once: true },
+        );
+      })();
+    </script>
     <script src="./src/core/fsl-pipeline.js"></script>
     <script src="./src/ui/landmark-renderer.js"></script>
     <script src="./src/tracker/mediapipe-tracker.js"></script>
