@@ -563,7 +563,6 @@
     }
     await tf.setBackend(fastest.backend);
     await tf.ready();
-);
     return { selected: fastest.backend, results };
   }
 
