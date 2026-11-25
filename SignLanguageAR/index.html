@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="fil">
+﻿<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -14,7 +14,7 @@
     />
     <meta
       name="description"
-      content="SignAR is an installable browser-based Filipino Sign Language recognizer with live camera feedback and optional speech output."
+      content="SignAR turns supported Filipino Sign Language signs into text using your device camera."
     />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" crossorigin />
@@ -23,7 +23,7 @@
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon.svg" />
     <link rel="stylesheet" href="src/ui/style.css" />
-    <title>SignAR | FSL Decoder</title>
+    <title>SignAR | Filipino Sign Language</title>
   </head>
   <body>
     <div class="app-shell">
@@ -37,7 +37,7 @@
           />
           <div>
             <h1>SignAR</h1>
-            <p>Filipino Sign Language recognition</p>
+            <p>Filipino Sign Language, made visible</p>
           </div>
         </div>
         <div class="top-actions">
@@ -49,43 +49,76 @@
           >
             Dark mode
           </button>
-          <button class="secondary-btn install-btn" id="installBtn" hidden>
+          <button
+            class="secondary-btn install-btn"
+            id="installBtn"
+            type="button"
+            hidden
+          >
             Install app
           </button>
-          <div class="status-pill" id="cameraStatus">
+          <div
+            class="status-pill"
+            id="cameraStatus"
+            role="status"
+            aria-live="polite"
+          >
             <span></span> Camera off
           </div>
         </div>
       </header>
 
-      <nav class="main-nav" aria-label="SignAR sections">
-        <button class="nav-btn active" data-target="recognizeSection">
+      <nav class="main-nav" aria-label="SignAR sections" role="tablist">
+        <button
+          class="nav-btn active"
+          id="recognizeTab"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="recognizeSection"
+          data-target="recognizeSection"
+        >
           Recognize
         </button>
-        <button class="nav-btn" data-target="aboutSection">About SignAR</button>
+        <button
+          class="nav-btn"
+          id="aboutTab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="aboutSection"
+          data-target="aboutSection"
+        >
+          About SignAR
+        </button>
       </nav>
 
       <main>
-        <section id="recognizeSection" class="page-section active-section">
+        <section
+          id="recognizeSection"
+          class="page-section active-section"
+          role="tabpanel"
+          aria-labelledby="recognizeTab"
+          tabindex="0"
+        >
           <div class="dashboard">
-            <section class="camera-card">
+            <section class="camera-card" aria-labelledby="cameraHeading">
               <div class="section-heading">
                 <div>
-                  <span class="eyebrow">CAMERA · LOCAL PROCESSING</span>
-                  <h2>Live view</h2>
+                  <span class="eyebrow">SIGN RECOGNITION</span>
+                  <h2 id="cameraHeading">Recognize a sign</h2>
                 </div>
-                <button class="secondary-btn" id="switchCameraBtn">
-                  Use back camera
+                <button
+                  class="secondary-btn"
+                  id="switchCameraBtn"
+                  type="button"
+                >
+                  Use front camera
                 </button>
               </div>
 
               <div class="camera-stage" id="cameraStage">
                 <video id="video" autoplay playsinline muted></video>
-                <canvas
-                  id="landmarkCanvas"
-                  class="landmark-overlay"
-                  aria-hidden="true"
-                ></canvas>
                 <div
                   class="position-guide"
                   id="positionGuide"
@@ -93,173 +126,107 @@
                 >
                   <span></span><span></span><span></span>
                 </div>
-                <div class="ar-overlay" id="arOverlay">
-                  <div class="ar-title">FSL</div>
+                <div class="ar-overlay" id="arOverlay" aria-live="polite">
+                  <div class="ar-title">SIGN</div>
                   <div class="ar-sign" id="arSign">Waiting for a sign</div>
                   <div class="ar-meaning" id="arMeaning">
-                    Show a supported Filipino Sign Language gesture.
+                    Your recognized sign will appear here.
                   </div>
                 </div>
-                <div class="tracking-badge" id="trackingBadge">
-                  TRACKING: SEARCHING
+                <div
+                  class="tracking-badge"
+                  id="trackingBadge"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Looking for a sign
                 </div>
                 <div class="camera-placeholder" id="cameraPlaceholder">
                   <div class="hand-icon" aria-hidden="true"></div>
-                  <h3>Ready to decode FSL</h3>
+                  <h3>Ready when you are</h3>
                   <p>
-                    Start the camera and keep your hands, face, and upper body
-                    in frame so coordinated sign cues can be tracked.
+                    Start the camera, then sign with your hands and upper body
+                    in view.
                   </p>
                 </div>
-                <div class="scan-frame">
+                <div class="scan-frame" aria-hidden="true">
                   <span></span><span></span><span></span><span></span>
                 </div>
-                <div class="live-badge" id="liveBadge">LIVE TRACKING</div>
+                <div class="live-badge" id="liveBadge">Camera ready</div>
               </div>
 
               <div class="camera-actions">
-                <button class="primary-btn" id="startCameraBtn">
+                <button
+                  class="primary-btn"
+                  id="startCameraBtn"
+                  type="button"
+                >
                   Start camera
                 </button>
                 <button
                   class="secondary-btn"
-                  id="toggleLandmarksBtn"
+                  id="fullscreenBtn"
                   type="button"
-                  aria-pressed="true"
-                  aria-controls="landmarkCanvas"
+                  aria-expanded="false"
                 >
-                  Hide landmarks
-                </button>
-                <button class="secondary-btn" id="fullscreenBtn">
                   Expand view
                 </button>
-                <button class="danger-btn" id="stopCameraBtn" disabled>
-                  Stop
+                <button
+                  class="danger-btn"
+                  id="stopCameraBtn"
+                  type="button"
+                  disabled
+                >
+                  Stop camera
                 </button>
               </div>
               <p class="privacy-note">
-                Video and landmark processing run locally in your browser. The
-                preview opens while landmark tracking warms up. Raw recordings
-                are not uploaded by the public decoder.
+                Your camera stays on this device. Video is not uploaded.
               </p>
             </section>
 
-            <aside class="result-column">
-              <section class="result-card">
-                <span class="eyebrow">DECODER OUTPUT</span>
-                <div class="recognition-state verifying" id="recognitionState">
-                  CHECKING MODEL
+            <aside class="result-column" aria-label="Recognition and message">
+              <section class="result-card" aria-labelledby="resultHeading">
+                <span class="eyebrow">RECOGNITION</span>
+                <div
+                  class="recognition-state verifying"
+                  id="recognitionState"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Getting ready
                 </div>
-                <div class="result-label">Current sign prediction</div>
-                <div class="detected-sign" id="detectedSign">LOADING</div>
+                <div class="result-label" id="resultHeading">Current sign</div>
+                <div class="detected-sign" id="detectedSign">Loading</div>
                 <div class="confidence-row">
-                  <span>Model score</span
-                  ><strong id="confidenceValue">—</strong>
+                  <span>Match confidence</span>
+                  <strong id="confidenceValue">—</strong>
                 </div>
-                <div class="progress"><div id="confidenceBar"></div></div>
+                <div class="progress" aria-hidden="true">
+                  <div id="confidenceBar"></div>
+                </div>
                 <div class="translation-box">
-                  <span>Decoder status</span
-                  ><strong id="translationText"
-                    >Checking model eligibility and loading the decoder…</strong
-                  >
+                  <span>What’s happening</span>
+                  <strong id="translationText">Preparing sign recognition…</strong>
                 </div>
-                <div class="type-pill" id="typePill">Loading model</div>
-                <details class="debug-metrics">
-                  <summary>Live diagnostics</summary>
-                  <dl>
-                    <div>
-                      <dt>Tracking rate</dt>
-                      <dd><span id="trackingFps">—</span> FPS</dd>
-                    </div>
-                    <div>
-                      <dt>Inference</dt>
-                      <dd><span id="inferenceLatency">—</span> ms</dd>
-                    </div>
-                  </dl>
-                  <div class="score-threshold">
-                    <label for="scoreThreshold">
-                      Minimum score to decode
-                      <output id="scoreThresholdValue" for="scoreThreshold"
-                        >70%</output
-                      >
-                    </label>
-                    <input
-                      id="scoreThreshold"
-                      type="range"
-                      min="60"
-                      max="95"
-                      step="5"
-                      value="70"
-                    />
-                    <p>
-                      Predictions also need an 18-point margin and six
-                      consecutive stable frames. Scores are calibrated by the
-                      selected model.
-                    </p>
-                  </div>
-                  <div class="top-k-label">
-                    Top-3 per window (smoothed score)
-                  </div>
-                  <ol id="topKScores" aria-live="polite">
-                    <li>Waiting for inference</li>
-                  </ol>
-                  <dl class="decoder-diagnostics">
-                    <div>
-                      <dt>Hand source</dt>
-                      <dd id="diagnosticHandSource">Waiting for tracker</dd>
-                    </div>
-                    <div>
-                      <dt>Feature health</dt>
-                      <dd id="diagnosticFeatureHealth">
-                        Waiting for landmarks
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Feature stats</dt>
-                      <dd id="diagnosticFeatureStats">—</dd>
-                    </div>
-                    <div>
-                      <dt>Window / gap resets</dt>
-                      <dd id="diagnosticWindow">Pre-roll 0/6</dd>
-                    </div>
-                    <div>
-                      <dt>Recent votes</dt>
-                      <dd id="diagnosticVotes">None</dd>
-                    </div>
-                    <div>
-                      <dt>Decision</dt>
-                      <dd id="diagnosticDecision">Waiting for inference</dd>
-                    </div>
-                    <div>
-                      <dt>Stage p50 / p95</dt>
-                      <dd id="diagnosticStageTimings">Waiting for frames</dd>
-                    </div>
-                  </dl>
-                  <button
-                    class="secondary-btn"
-                    id="exportFeatureWindowsBtn"
-                    type="button"
-                    hidden
-                  >
-                    Export recent feature windows JSON
-                  </button>
-                </details>
+                <div class="type-pill" id="typePill">Preparing</div>
               </section>
 
-              <section class="sentence-card">
+              <section class="sentence-card" aria-labelledby="sentenceHeading">
                 <div class="section-heading compact">
                   <div>
-                    <span class="eyebrow">TEXT + VOICE</span>
-                    <h3>Live sentence</h3>
+                    <span class="eyebrow">YOUR MESSAGE</span>
+                    <h3 id="sentenceHeading">Live sentence</h3>
                   </div>
                   <button
                     class="secondary-btn speak-btn"
                     id="speakBtn"
-                    title="Speak sentence"
-                    aria-label="Speak the decoded sentence"
+                    type="button"
+                    title="Read sentence aloud"
+                    aria-label="Read the decoded sentence aloud"
                     disabled
                   >
-                    Speak
+                    Read aloud
                   </button>
                 </div>
                 <div class="sentence-block">
@@ -270,11 +237,6 @@
                 </div>
                 <div class="sentence-block clean-block">
                   <span class="sentence-label">Decoded sentence</span>
-                  <small class="sentence-hint"
-                    >Letters join together; word and phrase signs add their
-                    display text as separate units. Pause to separate spelled
-                    words.</small
-                  >
                   <div
                     class="sentence-output"
                     id="sentenceOutput"
@@ -284,113 +246,96 @@
                   </div>
                 </div>
                 <div class="sentence-actions">
-                  <button class="secondary-btn" id="deleteBtn">Delete</button>
-                  <button class="secondary-btn" id="clearSentenceBtn">
+                  <button class="secondary-btn" id="deleteBtn" type="button">
+                    Delete last sign
+                  </button>
+                  <button
+                    class="secondary-btn"
+                    id="clearSentenceBtn"
+                    type="button"
+                  >
                     Clear
                   </button>
-                  <button class="secondary-btn" id="copySentenceBtn">
-                    Copy
+                  <button
+                    class="secondary-btn"
+                    id="copySentenceBtn"
+                    type="button"
+                  >
+                    Copy sentence
                   </button>
                 </div>
                 <div class="voice-controls">
-                  <label class="voice-language" for="voiceLanguage"
-                    ><span>Voice language</span>
+                  <label class="voice-language" for="voiceLanguage">
+                    <span>Read aloud in</span>
                     <select id="voiceLanguage">
                       <option value="fil-PH" selected>Filipino</option>
                       <option value="en-PH">English (Philippines)</option>
                       <option value="auto">Browser default</option>
                     </select>
                   </label>
-                  <label class="speech-toggle"
-                    ><input type="checkbox" id="autoSpeakToggle" checked />
-                    <span>Speak sentence after signing pause</span></label
+                  <label class="speech-toggle">
+                    <input type="checkbox" id="autoSpeakToggle" checked />
+                    <span>Read sentence after a pause</span>
+                  </label>
+                  <div
+                    class="speech-status"
+                    id="speechStatus"
+                    role="status"
+                    aria-live="polite"
                   >
-                  <div class="speech-status" id="speechStatus" role="status">
-                    Checking voice support...
+                    Checking voice support…
                   </div>
                 </div>
-                <div class="model-note">
-                  <strong>Model status</strong
-                  ><span id="modelStatus"
-                    >Checking model eligibility and loading the decoder…</span
-                  >
-                </div>
+                <p
+                  class="model-note"
+                  id="modelStatus"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Preparing sign recognition…
+                </p>
               </section>
             </aside>
           </div>
         </section>
 
-        <section id="aboutSection" class="page-section">
+        <section
+          id="aboutSection"
+          class="page-section"
+          role="tabpanel"
+          aria-labelledby="aboutTab"
+          tabindex="0"
+        >
           <div class="about-grid">
             <article class="info-card card">
-              <span class="eyebrow">CURRENT STATUS</span>
-              <h2>What is SignAR?</h2>
+              <span class="eyebrow">ABOUT</span>
+              <h2>Communication through sign</h2>
               <p>
-                SignAR is a browser-based Filipino Sign Language recognition
-                system. Holistic-v4 tracks coordinated two-hand, face, and
-                body cues across 30 ordered frames, and the live decoder
-                segments sign streams at stable class changes or pauses. The
-                installed model still recognizes its existing
-                fingerspelling labels with the older hand-v3 schema; new words,
-                phrases, dynamic signs, and holistic cues become recognizable
-                after a matching model candidate is trained and transferred.
-                Evaluation metrics describe the recorded dataset and may differ
-                across signers, cameras, and environments.
+                SignAR turns supported Filipino Sign Language signs into text
+                using your device’s camera. It is designed to support learning
+                and everyday communication. The signs available depend on the
+                recognition model in this version.
               </p>
             </article>
             <article class="info-card card">
-              <span class="eyebrow">DECODER PIPELINE</span>
-              <h2>How SignAR works</h2>
+              <span class="eyebrow">GET STARTED</span>
+              <h2>How to use SignAR</h2>
               <ul>
+                <li>Select <strong>Recognize</strong> and start the camera.</li>
+                <li>Keep your hands and upper body in view, then sign naturally.</li>
                 <li>
-                  <strong>Camera:</strong> captures a local video stream without
-                  uploading it.
-                </li>
-                <li>
-                  <strong>MediaPipe tracking:</strong> a pinned Tasks Vision
-                  HolisticLandmarker tracks both hands, face, and body with
-                  GPU and CPU fallback. A separate face check indicates when
-                  multiple people are in view while decoding continues.
-                </li>
-                <li>
-                  <strong>Shared normalizer:</strong> converts each frame into
-                  422 values for two hands, body pose, facial cues, and cue
-                  presence. Thirty ordered frames preserve sign movement.
-                </li>
-                <li>
-                  <strong>Streaming decoder:</strong> sends ordered holistic
-                  sequences to a compatible model, smooths probabilities, and
-                  segments a continuous stream at stable sign changes or
-                  pauses. Manifest metadata distinguishes letters, word signs,
-                  phrase signs, and dynamic signs.
-                </li>
-                <li>
-                  <strong>TensorFlow.js:</strong> loads labels and output
-                  dimensions from a compatible, validated model manifest, then
-                  benchmarks WebGPU, WebGL, WebAssembly, and CPU to select the
-                  fastest backend supported by this device.
-                </li>
-                <li>
-                  <strong>Sentence and voice:</strong> appends segmented sign
-                  units using configured display text and speaks after a pause.
+                  Recognized signs appear in the message area. Copy or read the
+                  sentence aloud when you’re ready.
                 </li>
               </ul>
-              <p>
-                <strong>Model status:</strong> predictions are enabled after a
-                compatible model and its evaluation files pass the SignAR
-                validation profile.
-              </p>
             </article>
             <article class="info-card card">
               <span class="eyebrow">WHO IT SUPPORTS</span>
-              <h2>Built for FSL communication</h2>
+              <h2>Made for FSL learners</h2>
               <ul>
+                <li>Filipino Sign Language signers and learners.</li>
                 <li>
-                  Filipino Sign Language signers and learners.
-                </li>
-                <li>
-                  Families, interpreters, educators, and communication
-                  partners.
+                  Families, interpreters, educators, and communication partners.
                 </li>
                 <li>
                   Organizations working to make sign-supported communication
@@ -399,15 +344,11 @@
               </ul>
             </article>
             <article class="info-card card">
-              <span class="eyebrow">ACCESSIBILITY SUPPORT</span>
-              <h2>A flexible recognition system</h2>
+              <span class="eyebrow">PRIVACY</span>
+              <h2>Your camera stays with you</h2>
               <p>
-                SignAR converts model-supported FSL signs into readable text
-                using local camera processing. Its vocabulary can expand as
-                reviewed words, phrases, and dynamic signs are added to the
-                model. Accepted labels and configured meanings appear in a
-                two-dimensional card over the camera preview; the current
-                release does not spatially anchor 3D content.
+                Sign recognition runs in your browser. Camera video is not
+                uploaded by SignAR.
               </p>
             </article>
           </div>
@@ -415,67 +356,8 @@
       </main>
     </div>
 
-    <div class="toast" id="toast"></div>
-    <script>
-      (() => {
-        const failStartup = (message) => {
-          const state = document.getElementById("recognitionState");
-          if (
-            !state ||
-            !["CHECKING MODEL", "LOADING MODEL"].includes(
-              state.textContent.trim(),
-            )
-          )
-            return;
-          state.textContent = "DECODER STARTUP ERROR";
-          state.className = "recognition-state locked";
-          const detected = document.getElementById("detectedSign");
-          const translation = document.getElementById("translationText");
-          const type = document.getElementById("typePill");
-          const modelStatus = document.getElementById("modelStatus");
-          if (detected) detected.textContent = "UNAVAILABLE";
-          if (translation) translation.textContent = message;
-          if (type) type.textContent = "Startup error";
-          if (modelStatus) modelStatus.textContent = message;
-        };
-
-        window.addEventListener(
-          "error",
-          (event) => {
-            if (event.target instanceof HTMLScriptElement) {
-              const source = event.target.src;
-              if (source.includes("/src/"))
-                failStartup(
-                  "Could not load a decoder script. Check the GitHub Pages deployment and refresh the page.",
-                );
-              return;
-            }
-            if (event.filename && event.filename.includes("/src/"))
-              failStartup(
-                "The decoder could not start: " +
-                  (event.message || "a script error occurred") +
-                  ". Refresh the page; if this continues, check the browser console.",
-              );
-          },
-          true,
-        );
-
-        window.addEventListener(
-          "DOMContentLoaded",
-          () =>
-            window.setTimeout(() => {
-              const state = document.getElementById("recognitionState");
-              if (state?.textContent.trim() === "CHECKING MODEL")
-                failStartup(
-                  "The decoder did not initialize. Refresh the page; if this continues, check the GitHub Pages deployment and browser console.",
-                );
-            }, 10000),
-          { once: true },
-        );
-      })();
-    </script>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="./src/core/fsl-pipeline.js"></script>
-    <script src="./src/ui/landmark-renderer.js"></script>
     <script src="./src/tracker/mediapipe-tracker.js"></script>
     <script src="./src/interpreter/prediction-history.js"></script>
     <script src="./src/interpreter/stream-segmenter.js"></script>
