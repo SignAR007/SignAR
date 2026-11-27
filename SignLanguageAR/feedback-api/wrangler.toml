@@ -1,0 +1,13 @@
+name = "signar-feedback-api"
+main = "src/index.mjs"
+compatibility_date = "2026-11-27"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "signar-feedback"
+database_id = "bd6a2fdb-290c-4cda-8dc8-879e2f262b52"
+migrations_dir = "migrations"
+
+[vars]
+ALLOWED_ORIGINS = "http://localhost:8123,http://localhost:8124,https://signar007.github.io,http://localhost:8001"
