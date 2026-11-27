@@ -57,6 +57,19 @@
     modelStatus = $("modelStatus");
   const navButtons = [...document.querySelectorAll(".nav-btn")],
     sections = [...document.querySelectorAll(".page-section")];
+  const feedbackForm = $("feedbackForm"),
+    feedbackAlias = $("feedbackAlias"),
+    feedbackMessage = $("feedbackMessage"),
+    feedbackEntries = $("feedbackEntries"),
+    feedbackEmpty = $("feedbackEmpty"),
+    feedbackStatus = $("feedbackStatus"),
+    exportFeedbackBtn = $("exportFeedbackBtn"),
+    importFeedbackBtn = $("importFeedbackBtn"),
+    feedbackImportFile = $("feedbackImportFile");
+  const FEEDBACK_STORAGE_KEY = "signar-feedback-v1";
+  const FEEDBACK_API_URL =
+    window.SignARFeedbackConfig?.apiUrl?.replace(/\/+$/, "") || "";
+  let sharedFeedbackEntries = [];
 
   const PIPELINE = window.SignARPipeline;
   const PREDICTION_HISTORY = window.SignARPredictionHistory;
@@ -419,7 +432,6 @@
     sentenceRevision++;
     updateSentence();
     scheduleSpeech();
-    toastMessage("Segmented: " + label + " (" + Math.round(confidence) + "%)");
     recordStageTiming("commit", performance.now() - commitStarted);
   }
 
@@ -1728,6 +1740,7 @@
       landmarkCanvas.classList.toggle("mirror", facingMode === "user");
       clearTrackerLandmarks();
       video.classList.add("active");
+      cameraStage.classList.add("camera-live");
       placeholder.style.display = "none";
       liveBadge.textContent = "CAMERA ON";
       liveBadge.classList.add("show");
@@ -1762,6 +1775,7 @@
       stream = null;
       video.srcObject = null;
       video.classList.remove("active");
+      cameraStage.classList.remove("camera-live");
       clearTrackerLandmarks();
       liveBadge.textContent = "LIVE TRACKING";
       liveBadge.classList.remove("show");
@@ -1876,6 +1890,7 @@
     stream = null;
     video.srcObject = null;
     video.classList.remove("active");
+    cameraStage.classList.remove("camera-live");
     clearTrackerLandmarks();
     placeholder.style.display = "flex";
     liveBadge.textContent = "LIVE TRACKING";
@@ -1916,8 +1931,258 @@
       sections.forEach((s) =>
         s.classList.toggle("active-section", s.id === btn.dataset.target),
       );
+      if (btn.dataset.target === "feedbackSection") void syncFeedback();
     }),
   );
+  function readFeedback() {
+    try {
+      const entries = JSON.parse(
+        localStorage.getItem(FEEDBACK_STORAGE_KEY) || "[]",
+      );
+      return Array.isArray(entries)
+        ? entries.filter(
+            (entry) =>
+              entry &&
+              typeof entry.message === "string" &&
+              entry.message.trim(),
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  }
+  function storePendingFeedback(entries) {
+    localStorage.setItem(
+      FEEDBACK_STORAGE_KEY,
+      JSON.stringify(mergeFeedback(entries).slice(0, 50)),
+    );
+  }
+  function feedbackIdentity(entry) {
+    return typeof entry.id === "string" && entry.id
+      ? `id:${entry.id}`
+      : `legacy:${JSON.stringify([
+          entry.alias || "",
+          entry.message,
+          entry.createdAt || "",
+        ])}`;
+  }
+  function mergeFeedback(entries) {
+    const uniqueEntries = new Map();
+    entries.forEach((entry) => {
+      if (!entry || typeof entry.message !== "string" || !entry.message.trim())
+        return;
+      const key = feedbackIdentity(entry);
+      if (!uniqueEntries.has(key)) uniqueEntries.set(key, entry);
+    });
+    return [...uniqueEntries.values()].sort(
+      (first, second) =>
+        (Date.parse(second.createdAt || "") || 0) -
+        (Date.parse(first.createdAt || "") || 0),
+    );
+  }
+  function renderFeedback(entries = sharedFeedbackEntries) {
+    feedbackEntries.replaceChildren();
+    entries.forEach((entry) => {
+      const item = document.createElement("li");
+      item.className = "feedback-entry";
+      const heading = document.createElement("div");
+      heading.className = "feedback-entry-heading";
+      const name = document.createElement("strong");
+      name.textContent =
+        typeof entry.alias === "string" && entry.alias.trim()
+          ? entry.alias.trim()
+          : "Anonymous";
+      heading.append(name);
+      if (typeof entry.createdAt === "string") {
+        const date = new Date(entry.createdAt);
+        if (!Number.isNaN(date.getTime())) {
+          const time = document.createElement("time");
+          time.dateTime = entry.createdAt;
+          time.textContent = date.toLocaleString();
+          heading.append(time);
+        }
+      }
+      const message = document.createElement("p");
+      message.textContent = entry.message;
+      item.append(heading, message);
+      feedbackEntries.append(item);
+    });
+    feedbackEmpty.hidden = entries.length > 0;
+    exportFeedbackBtn.disabled = entries.length === 0;
+  }
+  async function syncFeedback(newEntries = []) {
+    const pendingEntries = mergeFeedback([...readFeedback(), ...newEntries]).map(
+      (entry) => ({
+        ...entry,
+        id:
+          typeof entry.id === "string" && entry.id
+            ? entry.id
+            : globalThis.crypto?.randomUUID?.() ||
+              `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      }),
+    );
+    if (pendingEntries.length) {
+      try {
+        storePendingFeedback(pendingEntries);
+      } catch {}
+    }
+    if (!FEEDBACK_API_URL) {
+      sharedFeedbackEntries = mergeFeedback([
+        ...sharedFeedbackEntries,
+        ...pendingEntries,
+      ]);
+      feedbackStatus.textContent = pendingEntries.length
+        ? "Shared sync is not configured. Feedback is queued on this device."
+        : "Shared feedback is not configured yet.";
+      renderFeedback();
+      return;
+    }
+    try {
+      for (let index = 0; index < pendingEntries.length; index += 50) {
+        const submitResponse = await fetch(
+          `${FEEDBACK_API_URL}/api/feedback`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entries: pendingEntries.slice(index, index + 50),
+            }),
+          },
+        );
+        if (!submitResponse.ok)
+          throw new Error("Could not submit queued feedback.");
+      }
+      const response = await fetch(`${FEEDBACK_API_URL}/api/feedback`, {
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Could not load shared feedback.");
+      const payload = await response.json();
+      if (!Array.isArray(payload.entries))
+        throw new Error("The feedback response was invalid.");
+      sharedFeedbackEntries = mergeFeedback(payload.entries);
+      try {
+        localStorage.removeItem(FEEDBACK_STORAGE_KEY);
+      } catch {}
+      feedbackStatus.textContent = newEntries.length
+        ? "Feedback submitted and shared across devices."
+        : `Shared feedback synced (${sharedFeedbackEntries.length} entries).`;
+      renderFeedback();
+    } catch {
+      sharedFeedbackEntries = mergeFeedback([
+        ...sharedFeedbackEntries,
+        ...pendingEntries,
+      ]);
+      feedbackStatus.textContent = pendingEntries.length
+        ? "Shared service unavailable. Feedback is queued on this device."
+        : "Could not load shared feedback. Check your connection.";
+      renderFeedback();
+    }
+  }
+  feedbackForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = feedbackMessage.value.trim();
+    if (!message) {
+      feedbackMessage.focus();
+      return;
+    }
+    const entry = {
+      id:
+        globalThis.crypto?.randomUUID?.() ||
+        `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      alias: feedbackAlias.value.trim(),
+      message,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      storePendingFeedback([entry, ...readFeedback()]);
+    } catch {}
+    feedbackForm.reset();
+    await syncFeedback([entry]);
+  });
+  exportFeedbackBtn.addEventListener("click", () => {
+    const entries = mergeFeedback([
+      ...sharedFeedbackEntries,
+      ...readFeedback(),
+    ]);
+    if (!entries.length) return;
+    const backup = {
+      format: "signar-feedback",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      entries,
+    };
+    const file = new Blob([JSON.stringify(backup, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "signar-feedback.json";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    feedbackStatus.textContent = "Shared feedback exported to a JSON file.";
+  });
+  importFeedbackBtn.addEventListener("click", () =>
+    feedbackImportFile.click(),
+  );
+  feedbackImportFile.addEventListener("change", async () => {
+    const file = feedbackImportFile.files?.[0];
+    if (!file) return;
+    try {
+      if (file.size > 1024 * 1024) throw new Error("File is too large.");
+      const backup = JSON.parse(await file.text());
+      if (
+        backup?.format !== "signar-feedback" ||
+        backup.version !== 1 ||
+        !Array.isArray(backup.entries)
+      )
+        throw new Error("Invalid SignAR feedback export.");
+      const importedEntries = backup.entries
+        .filter(
+          (entry) =>
+            entry &&
+            typeof entry.message === "string" &&
+            entry.message.trim() &&
+            entry.message.length <= 2000,
+        )
+        .map((entry) => ({
+          ...(typeof entry.id === "string" && entry.id
+            ? { id: entry.id }
+            : {}),
+          alias:
+            typeof entry.alias === "string" ? entry.alias.slice(0, 80) : "",
+          message: entry.message.trim(),
+          createdAt:
+            typeof entry.createdAt === "string" &&
+            !Number.isNaN(Date.parse(entry.createdAt))
+              ? entry.createdAt
+              : new Date().toISOString(),
+        }));
+      const pendingEntries = mergeFeedback([
+        ...readFeedback(),
+        ...importedEntries,
+      ]);
+      storePendingFeedback(pendingEntries);
+      await syncFeedback(importedEntries);
+    } catch {
+      feedbackStatus.textContent =
+        "Could not import this file. Choose a valid SignAR feedback JSON export.";
+    } finally {
+      feedbackImportFile.value = "";
+    }
+  });
+  renderFeedback();
+  void syncFeedback();
+  window.setInterval(() => {
+    const feedbackSection = $("feedbackSection");
+    if (
+      document.visibilityState === "visible" &&
+      feedbackSection.classList.contains("active-section")
+    )
+      void syncFeedback();
+  }, 30000);
   startBtn.addEventListener("click", startCamera);
   scoreThresholdInput.addEventListener("input", () => {
     minimumConfidencePercent = Number(scoreThresholdInput.value);

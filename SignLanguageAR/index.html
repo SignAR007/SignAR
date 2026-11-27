@@ -20,13 +20,14 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" crossorigin />
     <script src="src/ui/theme.js"></script>
+    <script src="src/ui/feedback-config.js"></script>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon.svg" />
     <link rel="stylesheet" href="src/ui/style.css" />
     <title>SignAR | FSL Decoder</title>
   </head>
-  <body>
+  <body class="clean-interpreter-ui">
     <div class="app-shell">
       <header class="topbar">
         <div class="brand">
@@ -66,6 +67,7 @@
         <button class="nav-btn" data-target="alphabetChartSection">
           Alphabet chart
         </button>
+        <button class="nav-btn" data-target="feedbackSection">Feedback</button>
         <button class="nav-btn" data-target="aboutSection">About SignAR</button>
       </nav>
 
@@ -73,254 +75,267 @@
         <section id="recognizeSection" class="page-section active-section">
           <div class="dashboard">
             <section class="camera-card">
-              <div class="section-heading">
-                <div>
-                  <span class="eyebrow">CAMERA · LOCAL PROCESSING</span>
-                  <h2>Live view</h2>
-                </div>
-                <button class="secondary-btn" id="switchCameraBtn">
-                  Use back camera
-                </button>
-              </div>
-
-              <div class="camera-stage" id="cameraStage">
-                <video id="video" autoplay playsinline muted></video>
-                <canvas
-                  id="landmarkCanvas"
-                  class="landmark-overlay"
-                  aria-hidden="true"
-                ></canvas>
-                <div
-                  class="position-guide"
-                  id="positionGuide"
-                  aria-hidden="true"
-                >
-                  <span></span><span></span><span></span>
-                </div>
-                <div class="ar-overlay" id="arOverlay">
-                  <div class="ar-title">FSL</div>
-                  <div class="ar-sign" id="arSign">Waiting for a sign</div>
-                  <div class="ar-meaning" id="arMeaning">
-                    Show a supported Filipino Sign Language gesture.
+              <div class="camera-view">
+                <div class="section-heading">
+                  <div>
+                    <span class="eyebrow">CAMERA · LOCAL PROCESSING</span>
+                    <h2>Live view</h2>
                   </div>
+                  <button class="secondary-btn" id="switchCameraBtn">
+                    Use back camera
+                  </button>
                 </div>
-                <div class="tracking-badge" id="trackingBadge">
-                  TRACKING: SEARCHING
-                </div>
-                <div class="camera-placeholder" id="cameraPlaceholder">
-                  <div class="hand-icon" aria-hidden="true"></div>
-                  <h3>Ready to decode FSL</h3>
-                  <p>
-                    Start the camera and keep your hands, face, and upper body
-                    in frame so coordinated sign cues can be tracked.
-                  </p>
-                </div>
-                <div class="scan-frame">
-                  <span></span><span></span><span></span><span></span>
-                </div>
-                <div class="live-badge" id="liveBadge">LIVE TRACKING</div>
-              </div>
 
-              <div class="camera-actions">
-                <button class="primary-btn" id="startCameraBtn">
-                  Start camera
-                </button>
-                <button
-                  class="secondary-btn"
-                  id="toggleLandmarksBtn"
-                  type="button"
-                  aria-pressed="true"
-                  aria-controls="landmarkCanvas"
-                >
-                  Hide landmarks
-                </button>
-                <button class="secondary-btn" id="fullscreenBtn">
-                  Expand view
-                </button>
-                <button class="danger-btn" id="stopCameraBtn" disabled>
-                  Stop
-                </button>
-              </div>
-              <p class="privacy-note">
-                Video and landmark processing run locally in your browser. The
-                preview opens while landmark tracking warms up. Raw recordings
-                are not uploaded by the public decoder.
-              </p>
-            </section>
-
-            <aside class="result-column">
-              <section class="result-card">
-                <span class="eyebrow">DECODER OUTPUT</span>
-                <div class="recognition-state verifying" id="recognitionState">
-                  CHECKING MODEL
-                </div>
-                <div class="result-label">Current sign prediction</div>
-                <div class="detected-sign" id="detectedSign">LOADING</div>
-                <div class="confidence-row">
-                  <span>Model score</span
-                  ><strong id="confidenceValue">—</strong>
-                </div>
-                <div class="progress"><div id="confidenceBar"></div></div>
-                <div class="translation-box">
-                  <span>Decoder status</span
-                  ><strong id="translationText"
-                    >Checking model eligibility and loading the decoder…</strong
+                <div class="camera-stage" id="cameraStage">
+                  <video id="video" autoplay playsinline muted></video>
+                  <canvas
+                    id="landmarkCanvas"
+                    class="landmark-overlay"
+                    aria-hidden="true"
+                  ></canvas>
+                  <div
+                    class="position-guide"
+                    id="positionGuide"
+                    aria-hidden="true"
                   >
-                </div>
-                <div class="type-pill" id="typePill">Loading model</div>
-                <details class="debug-metrics">
-                  <summary>Live diagnostics</summary>
-                  <dl>
-                    <div>
-                      <dt>Tracking rate</dt>
-                      <dd><span id="trackingFps">—</span> FPS</dd>
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="ar-overlay" id="arOverlay">
+                    <div class="ar-title">FSL</div>
+                    <div class="ar-sign" id="arSign">Waiting for a sign</div>
+                    <div class="ar-meaning" id="arMeaning">
+                      Show a supported Filipino Sign Language gesture.
                     </div>
-                    <div>
-                      <dt>Inference</dt>
-                      <dd><span id="inferenceLatency">—</span> ms</dd>
-                    </div>
-                  </dl>
-                  <div class="score-threshold">
-                    <label for="scoreThreshold">
-                      Minimum score to decode
-                      <output id="scoreThresholdValue" for="scoreThreshold"
-                        >70%</output
-                      >
-                    </label>
-                    <input
-                      id="scoreThreshold"
-                      type="range"
-                      min="60"
-                      max="95"
-                      step="5"
-                      value="70"
-                    />
+                  </div>
+                  <div class="tracking-badge" id="trackingBadge">
+                    TRACKING: SEARCHING
+                  </div>
+                  <div class="camera-placeholder" id="cameraPlaceholder">
+                    <div class="hand-icon" aria-hidden="true"></div>
+                    <h3>Ready to decode FSL</h3>
                     <p>
-                      Predictions also need an 18-point margin and six
-                      consecutive stable frames. Scores are calibrated by the
-                      selected model.
+                      Start the camera and keep your hands, face, and upper body
+                      in frame so coordinated sign cues can be tracked.
                     </p>
                   </div>
-                  <div class="top-k-label">
-                    Top-3 per window (smoothed score)
+                  <div class="scan-frame">
+                    <span></span><span></span><span></span><span></span>
                   </div>
-                  <ol id="topKScores" aria-live="polite">
-                    <li>Waiting for inference</li>
-                  </ol>
-                  <dl class="decoder-diagnostics">
-                    <div>
-                      <dt>Hand source</dt>
-                      <dd id="diagnosticHandSource">Waiting for tracker</dd>
-                    </div>
-                    <div>
-                      <dt>Feature health</dt>
-                      <dd id="diagnosticFeatureHealth">
-                        Waiting for landmarks
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Feature stats</dt>
-                      <dd id="diagnosticFeatureStats">—</dd>
-                    </div>
-                    <div>
-                      <dt>Window / gap resets</dt>
-                      <dd id="diagnosticWindow">Pre-roll 0/6</dd>
-                    </div>
-                    <div>
-                      <dt>Recent votes</dt>
-                      <dd id="diagnosticVotes">None</dd>
-                    </div>
-                    <div>
-                      <dt>Decision</dt>
-                      <dd id="diagnosticDecision">Waiting for inference</dd>
-                    </div>
-                    <div>
-                      <dt>Stage p50 / p95</dt>
-                      <dd id="diagnosticStageTimings">Waiting for frames</dd>
-                    </div>
-                  </dl>
-                  <button
-                    class="secondary-btn"
-                    id="exportFeatureWindowsBtn"
-                    type="button"
-                    hidden
+                  <div class="live-badge" id="liveBadge">LIVE TRACKING</div>
+                  <aside
+                    class="result-column camera-readout"
+                    aria-label="Interpreter output"
                   >
-                    Export recent feature windows JSON
-                  </button>
-                </details>
-              </section>
+                    <section class="result-card">
+                      <span class="eyebrow">INTERPRETER</span>
+                      <div class="recognition-state verifying" id="recognitionState">
+                        CHECKING MODEL
+                      </div>
+                      <div class="result-label">Current sign prediction</div>
+                      <div class="detected-sign" id="detectedSign">LOADING</div>
+                      <div class="confidence-row">
+                        <span>Model score</span
+                        ><strong id="confidenceValue">—</strong>
+                      </div>
+                      <div class="progress"><div id="confidenceBar"></div></div>
+                      <div class="type-pill" id="typePill">Loading model</div>
+                      <details class="debug-metrics">
+                        <summary>Live diagnostics</summary>
+                        <dl>
+                          <div>
+                            <dt>Tracking rate</dt>
+                            <dd><span id="trackingFps">—</span> FPS</dd>
+                          </div>
+                          <div>
+                            <dt>Inference</dt>
+                            <dd><span id="inferenceLatency">—</span> ms</dd>
+                          </div>
+                        </dl>
+                        <div class="score-threshold">
+                          <label for="scoreThreshold">
+                            Minimum score to decode
+                            <output id="scoreThresholdValue" for="scoreThreshold"
+                              >70%</output
+                            >
+                          </label>
+                          <input
+                            id="scoreThreshold"
+                            type="range"
+                            min="60"
+                            max="95"
+                            step="5"
+                            value="70"
+                          />
+                          <p>
+                            Predictions also need an 18-point margin and six
+                            consecutive stable frames. Scores are calibrated by the
+                            selected model.
+                          </p>
+                        </div>
+                        <div class="top-k-label">
+                          Top-3 per window (smoothed score)
+                        </div>
+                        <ol id="topKScores" aria-live="polite">
+                          <li>Waiting for inference</li>
+                        </ol>
+                        <dl class="decoder-diagnostics">
+                          <div>
+                            <dt>Hand source</dt>
+                            <dd id="diagnosticHandSource">Waiting for tracker</dd>
+                          </div>
+                          <div>
+                            <dt>Feature health</dt>
+                            <dd id="diagnosticFeatureHealth">
+                              Waiting for landmarks
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Feature stats</dt>
+                            <dd id="diagnosticFeatureStats">—</dd>
+                          </div>
+                          <div>
+                            <dt>Window / gap resets</dt>
+                            <dd id="diagnosticWindow">Pre-roll 0/6</dd>
+                          </div>
+                          <div>
+                            <dt>Recent votes</dt>
+                            <dd id="diagnosticVotes">None</dd>
+                          </div>
+                          <div>
+                            <dt>Decision</dt>
+                            <dd id="diagnosticDecision">Waiting for inference</dd>
+                          </div>
+                          <div>
+                            <dt>Stage p50 / p95</dt>
+                            <dd id="diagnosticStageTimings">Waiting for frames</dd>
+                          </div>
+                        </dl>
+                        <button
+                          class="secondary-btn"
+                          id="exportFeatureWindowsBtn"
+                          type="button"
+                          hidden
+                        >
+                          Export recent feature windows JSON
+                        </button>
+                      </details>
+                    </section>
 
-              <section class="sentence-card">
-                <div class="section-heading compact">
-                  <div>
-                    <span class="eyebrow">TEXT + VOICE</span>
-                    <h3>Live sentence</h3>
+                    <section class="sentence-card">
+                      <div class="section-heading compact">
+                        <div>
+                          <span class="eyebrow">LIVE OUTPUT</span>
+                          <h3>Decoded sentence</h3>
+                        </div>
+                        <button
+                          class="secondary-btn speak-btn"
+                          id="speakBtn"
+                          title="Speak sentence"
+                          aria-label="Speak the decoded sentence"
+                          disabled
+                        >
+                          Speak
+                        </button>
+                      </div>
+                      <div class="sentence-block">
+                        <span class="sentence-label">Recognized signs</span>
+                        <div class="raw-output" id="rawOutput" aria-live="polite">
+                          Wala pang na-decode na senyas.
+                        </div>
+                      </div>
+                      <div class="sentence-block clean-block">
+                        <small class="sentence-hint"
+                          >Letters join together; pauses separate words. Word and
+                          phrase signs use their display text.</small
+                        >
+                        <div
+                          class="sentence-output"
+                          id="sentenceOutput"
+                          aria-live="polite"
+                        >
+                          Ang na-decode na pangungusap ay lalabas dito.
+                        </div>
+                      </div>
+
+
+                      <div class="model-note">
+                        <strong>Model status</strong
+                        ><span id="modelStatus"
+                          >Checking model eligibility and loading the decoder…</span
+                        >
+                      </div>
+                    </section>
+                  </aside>
+                </div>
+
+                <div class="below-camera-controls">
+                  <div class="camera-actions">
+                    <button class="primary-btn" id="startCameraBtn">
+                      Start camera
+                    </button>
+                    <button
+                      class="secondary-btn"
+                      id="toggleLandmarksBtn"
+                      type="button"
+                      aria-pressed="true"
+                      aria-controls="landmarkCanvas"
+                    >
+                      Hide landmarks
+                    </button>
+                    <button class="secondary-btn" id="fullscreenBtn">
+                      Expand view
+                    </button>
+                    <button class="danger-btn" id="stopCameraBtn" disabled>
+                      Stop
+                    </button>
                   </div>
-                  <button
-                    class="secondary-btn speak-btn"
-                    id="speakBtn"
-                    title="Speak sentence"
-                    aria-label="Speak the decoded sentence"
-                    disabled
-                  >
-                    Speak
-                  </button>
-                </div>
-                <div class="sentence-block">
-                  <span class="sentence-label">Recognized signs</span>
-                  <div class="raw-output" id="rawOutput" aria-live="polite">
-                    Wala pang na-decode na senyas.
+                  <div class="translation-box">
+                    <span>Status</span
+                    ><strong id="translationText"
+                      >Checking model eligibility and loading the decoder…</strong
+                    >
                   </div>
-                </div>
-                <div class="sentence-block clean-block">
-                  <span class="sentence-label">Decoded sentence</span>
-                  <small class="sentence-hint"
-                    >Letters join together; word and phrase signs add their
-                    display text as separate units. Pause to separate spelled
-                    words.</small
-                  >
-                  <div
-                    class="sentence-output"
-                    id="sentenceOutput"
-                    aria-live="polite"
-                  >
-                    Ang na-decode na pangungusap ay lalabas dito.
+                  <div class="sentence-actions">
+                    <button class="secondary-btn" id="deleteBtn">
+                      Undo last sign
+                    </button>
+                    <button class="secondary-btn" id="clearSentenceBtn">
+                      Clear sentence
+                    </button>
+                    <button class="secondary-btn" id="copySentenceBtn">
+                      Copy sentence
+                    </button>
                   </div>
+                  <details class="voice-settings">
+                    <summary class="eyebrow">Voice settings</summary>
+                    <div class="voice-controls">
+                      <label class="voice-language" for="voiceLanguage"
+                        ><span>Voice language</span>
+                        <select id="voiceLanguage">
+                          <option value="fil-PH" selected>Filipino</option>
+                          <option value="en-PH">English (Philippines)</option>
+                          <option value="auto">Browser default</option>
+                        </select>
+                      </label>
+                      <label class="speech-toggle"
+                        ><input type="checkbox" id="autoSpeakToggle" checked />
+                        <span>Read sentence after a signing pause</span></label
+                      >
+                      <div class="speech-status" id="speechStatus" role="status">
+                        Checking voice support...
+                      </div>
+                    </div>
+                  </details>
                 </div>
-                <div class="sentence-actions">
-                  <button class="secondary-btn" id="deleteBtn">Delete</button>
-                  <button class="secondary-btn" id="clearSentenceBtn">
-                    Clear
-                  </button>
-                  <button class="secondary-btn" id="copySentenceBtn">
-                    Copy
-                  </button>
-                </div>
-                <div class="voice-controls">
-                  <label class="voice-language" for="voiceLanguage"
-                    ><span>Voice language</span>
-                    <select id="voiceLanguage">
-                      <option value="fil-PH" selected>Filipino</option>
-                      <option value="en-PH">English (Philippines)</option>
-                      <option value="auto">Browser default</option>
-                    </select>
-                  </label>
-                  <label class="speech-toggle"
-                    ><input type="checkbox" id="autoSpeakToggle" checked />
-                    <span>Speak sentence after signing pause</span></label
-                  >
-                  <div class="speech-status" id="speechStatus" role="status">
-                    Checking voice support...
-                  </div>
-                </div>
-                <div class="model-note">
-                  <strong>Model status</strong
-                  ><span id="modelStatus"
-                    >Checking model eligibility and loading the decoder…</span
-                  >
-                </div>
-              </section>
-            </aside>
+                <p class="privacy-note">
+                  Video and landmark processing run locally in your browser. The
+                  preview opens while landmark tracking warms up. Raw recordings
+                  are not uploaded by the public decoder.
+                </p>
+              </div>
+
+              
+            </section>
           </div>
         </section>
 
@@ -341,6 +356,82 @@
                 FSL handshapes for the letters A to Z.
               </figcaption>
             </figure>
+          </div>
+        </section>
+
+        <section id="feedbackSection" class="page-section">
+          <div class="feedback-view">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">YOUR NOTES</span>
+                <h2>Share feedback</h2>
+              </div>
+            </div>
+            <p class="feedback-privacy">
+              Feedback is shared across devices and visible to all SignAR users.
+              Your optional alias and message are stored in a shared database.
+              Do not include personal or sensitive information.
+            </p>
+            <form class="feedback-form" id="feedbackForm">
+              <label for="feedbackAlias">
+                Name or alias <span>(optional)</span>
+                <input
+                  id="feedbackAlias"
+                  name="alias"
+                  type="text"
+                  autocomplete="nickname"
+                  maxlength="80"
+                />
+              </label>
+              <label for="feedbackMessage">
+                Feedback message
+                <textarea
+                  id="feedbackMessage"
+                  name="message"
+                  rows="6"
+                  maxlength="2000"
+                  required
+                ></textarea>
+              </label>
+              <div class="feedback-form-actions">
+                <button class="primary-btn" type="submit">
+                  Submit feedback
+                </button>
+              </div>
+            </form>
+            <p class="feedback-status" id="feedbackStatus" role="status" aria-live="polite"></p>
+            <section class="saved-feedback" aria-labelledby="savedFeedbackTitle">
+              <div class="saved-feedback-heading">
+                <h3 id="savedFeedbackTitle">Saved feedback</h3>
+                <div class="feedback-transfer-actions">
+                  <button
+                    class="secondary-btn"
+                    id="exportFeedbackBtn"
+                    type="button"
+                    disabled
+                  >
+                    Export JSON
+                  </button>
+                  <button
+                    class="secondary-btn"
+                    id="importFeedbackBtn"
+                    type="button"
+                  >
+                    Import JSON
+                  </button>
+                  <input
+                    id="feedbackImportFile"
+                    type="file"
+                    accept=".json,application/json"
+                    hidden
+                  />
+                </div>
+              </div>
+              <ol class="feedback-list" id="feedbackEntries"></ol>
+              <p class="feedback-empty" id="feedbackEmpty">
+                No shared feedback yet.
+              </p>
+            </section>
           </div>
         </section>
 

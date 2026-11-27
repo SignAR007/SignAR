@@ -1,9 +1,10 @@
-const CACHE = "signar-v41";
+const CACHE = "signar-v47";
 const CORE = [
   "./",
   "./index.html",
   "./src/ui/style.css",
   "./src/ui/theme.js",
+  "./src/ui/feedback-config.js",
   "./src/ui/landmark-renderer.js",
   "./src/core/fsl-pipeline.js",
   "./src/tracker/mediapipe-tracker.js",
@@ -12,6 +13,7 @@ const CORE = [
   "./src/interpreter/app.js",
   "./manifest.webmanifest",
   "./icons/icon.svg",
+  "./icons/fsl-alphabet-chart.jpg",
   "./model/vocabulary.json",
   "./model/metadata.json",
   "./model/evaluation.json",
