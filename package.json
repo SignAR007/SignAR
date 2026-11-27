@@ -1,0 +1,16 @@
+{
+  "name": "signar",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "feedback:dev": "wrangler dev --config feedback-api/wrangler.toml --port 8787",
+    "feedback:migrate:local": "wrangler d1 migrations apply signar-feedback --local --config feedback-api/wrangler.toml",
+    "feedback:migrate:remote": "wrangler d1 migrations apply signar-feedback --remote --config feedback-api/wrangler.toml",
+    "feedback:deploy": "wrangler deploy --config feedback-api/wrangler.toml"
+  },
+  "devDependencies": {
+    "prettier": "3.10.1",
+    "wrangler": "^4.168.0"
+  }
+}
